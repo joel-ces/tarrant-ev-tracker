@@ -130,7 +130,12 @@ const DATA2022 = [
 ];
 
 // Latest geographic/roster breakdown, when Claude has processed an uploaded roster file.
-const GEO = { date:"TEST: Nov 2025 Day 1", rows:[{"name": "Commissioner Pct 1", "count": 727}, {"name": "Commissioner Pct 2", "count": 928}, {"name": "Commissioner Pct 3", "count": 2454}, {"name": "Commissioner Pct 4", "count": 1440}] };
+// GEO: { date, groups:[{title, rows:[{name, count}, ...]}, ...] }
+const GEO = { date:"TEST: Nov 2025 Day 1", groups:[
+  {title:"By commissioner precinct", rows:[{"name": "Commissioner Pct 1", "count": 727}, {"name": "Commissioner Pct 2", "count": 928}, {"name": "Commissioner Pct 3", "count": 2454}, {"name": "Commissioner Pct 4", "count": 1440}]},
+  {title:"By state senate district", rows:[{"name": "Senate District 9", "count": 3522}, {"name": "Senate District 10", "count": 1074}, {"name": "Senate District 22", "count": 534}, {"name": "Senate District 12", "count": 417}, {"name": "Senate District 23", "count": 2}]},
+  {title:"By state house district", rows:[{"name": "House District 98", "count": 1082}, {"name": "House District 91", "count": 699}, {"name": "House District 94", "count": 680}, {"name": "House District 93", "count": 648}, {"name": "House District 99", "count": 639}, {"name": "House District 96", "count": 497}, {"name": "House District 95", "count": 407}, {"name": "House District 97", "count": 303}, {"name": "House District 90", "count": 230}, {"name": "House District 92", "count": 216}, {"name": "House District 101", "count": 148}]},
+]};
 
 // Registered voters by precinct, current cycle. Fill in as: {2004: 1850, ...}. Empty until the
 // county publishes a registered-voter count on the 2026 precinct lines.
@@ -206,11 +211,15 @@ function main(){
 
     // geo table
     const gt = document.getElementById('geoTable');
-    if(!geo || !geo.rows || !geo.rows.length){
+    if(!geo || !geo.groups || !geo.groups.length){
       gt.innerHTML = '<div class="empty">No precinct/district breakdown yet — this fills in once a daily voter roster is uploaded.</div>';
     } else {
-      let rows = geo.rows.map(r=>`<tr><td>${r.name}</td><td>${(r.count||0).toLocaleString()}</td></tr>`).join('');
-      gt.innerHTML = `<div class="sub" style="margin-bottom:6px">As of ${geo.date}</div><table><tr><th>Area</th><th>Voters</th></tr>${rows}</table>`;
+      let out = `<div class="sub" style="margin-bottom:10px">As of ${geo.date}</div>`;
+      out += geo.groups.map(g=>{
+        let rows = g.rows.map(r=>`<tr><td>${r.name}</td><td>${(r.count||0).toLocaleString()}</td></tr>`).join('');
+        return `<div style="font-family:-apple-system,Helvetica,Arial,sans-serif; font-size:.82rem; font-weight:600; margin:14px 0 4px">${g.title}</div><table><tr><th>Area</th><th>Voters</th></tr>${rows}</table>`;
+      }).join('');
+      gt.innerHTML = out;
     }
   }
 
