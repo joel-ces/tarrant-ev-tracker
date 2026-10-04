@@ -290,8 +290,10 @@ function renderMap(){
       else info = "No registration count for this precinct yet";
     } else if(mapMode==="turnout"){
       const reg = REGISTERED[pr.p], vt = TURNOUT_BY_PRECINCT[pr.p];
-      if(reg && vt!==undefined){ const pct=vt/reg; fill=turnoutColor(pct); info=`${vt.toLocaleString()} of ${reg.toLocaleString()} registered (${(pct*100).toFixed(1)}%)`; }
-      else info = "No turnout data yet";
+      const lean = PARTISAN[pr.p];
+      const leanStr = lean!==undefined ? ` · ${lean>=0.5?'R':'D'}+${(Math.abs(lean-0.5)*200).toFixed(1)}` : '';
+      if(reg && vt!==undefined){ const pct=vt/reg; fill=turnoutColor(pct); info=`${vt.toLocaleString()} of ${reg.toLocaleString()} registered (${(pct*100).toFixed(1)}%)${leanStr}`; }
+      else info = "No turnout data yet" + leanStr;
     } else if(mapMode==="partisan"){
       const p = PARTISAN[pr.p];
       if(p!==undefined){
