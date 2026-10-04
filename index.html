@@ -130,11 +130,12 @@ const DATA2022 = [
 ];
 
 // Latest geographic/roster breakdown, when Claude has processed an uploaded roster file.
-// GEO: { date, groups:[{title, rows:[{name, count}, ...]}, ...] }
+// GEO: { date, groups:[{title, field, rows:[{key, name, count}, ...]}, ...] }
+// field = the matching key in PRECINCTS (com/sen/hse), used to compute registered-voter % live.
 const GEO = { date:"TEST: Nov 2025 Day 1", groups:[
-  {title:"By commissioner precinct", rows:[{"name": "Commissioner Pct 1", "count": 727}, {"name": "Commissioner Pct 2", "count": 928}, {"name": "Commissioner Pct 3", "count": 2454}, {"name": "Commissioner Pct 4", "count": 1440}]},
-  {title:"By state senate district", rows:[{"name": "Senate District 9", "count": 3522}, {"name": "Senate District 10", "count": 1074}, {"name": "Senate District 22", "count": 534}, {"name": "Senate District 12", "count": 417}, {"name": "Senate District 23", "count": 2}]},
-  {title:"By state house district", rows:[{"name": "House District 98", "count": 1082}, {"name": "House District 91", "count": 699}, {"name": "House District 94", "count": 680}, {"name": "House District 93", "count": 648}, {"name": "House District 99", "count": 639}, {"name": "House District 96", "count": 497}, {"name": "House District 95", "count": 407}, {"name": "House District 97", "count": 303}, {"name": "House District 90", "count": 230}, {"name": "House District 92", "count": 216}, {"name": "House District 101", "count": 148}]},
+  {title:"By commissioner precinct", field:"com", rows:[{"key": "3", "name": "Commissioner Pct 3", "count": 2454}, {"key": "4", "name": "Commissioner Pct 4", "count": 1440}, {"key": "2", "name": "Commissioner Pct 2", "count": 928}, {"key": "1", "name": "Commissioner Pct 1", "count": 727}]},
+  {title:"By state senate district", field:"sen", rows:[{"key": "9", "name": "Senate District 9", "count": 3522}, {"key": "10", "name": "Senate District 10", "count": 1074}, {"key": "22", "name": "Senate District 22", "count": 534}, {"key": "12", "name": "Senate District 12", "count": 417}, {"key": "23", "name": "Senate District 23", "count": 2}]},
+  {title:"By state house district", field:"hse", rows:[{"key": "98", "name": "House District 98", "count": 1082}, {"key": "91", "name": "House District 91", "count": 699}, {"key": "94", "name": "House District 94", "count": 680}, {"key": "93", "name": "House District 93", "count": 648}, {"key": "99", "name": "House District 99", "count": 639}, {"key": "96", "name": "House District 96", "count": 497}, {"key": "95", "name": "House District 95", "count": 407}, {"key": "97", "name": "House District 97", "count": 303}, {"key": "90", "name": "House District 90", "count": 230}, {"key": "92", "name": "House District 92", "count": 216}, {"key": "101", "name": "House District 101", "count": 148}]},
 ]};
 
 // Registered voters by precinct, current cycle. Fill in as: {2004: 1850, ...}. Empty until the
@@ -162,12 +163,14 @@ function main(){
       stats.innerHTML = '<div class="empty" style="grid-column:1/-1">No days logged yet. Early voting begins October 19, 2026 — data will appear here once the county posts the first daily report.</div>';
     } else {
       const totalCum = (last.mail_cumulative||0) + (last.inperson_cumulative||0);
+      const totalReg = Object.values(REGISTERED).reduce((a,b)=>a+b, 0);
       const cells = [
         [totalCum.toLocaleString(), 'Total cumulative EV'],
         [(last.mail_cumulative||0).toLocaleString(), 'Mail cumulative'],
         [(last.inperson_cumulative||0).toLocaleString(), 'In-person cumulative'],
         [(last.inperson_daily||0).toLocaleString(), 'In-person, ' + last.date],
       ];
+      if(totalReg){ cells.push([(totalCum/totalReg*100).toFixed(2)+'%', 'Turnout (of '+totalReg.toLocaleString()+' registered)']); }
       const base22 = DATA2022.find(d=>d.day===last.day);
       if(base22){
         const pct = ((last.inperson_cumulative/base22.inperson_cumulative)-1)*100;
@@ -216,8 +219,13 @@ function main(){
     } else {
       let out = `<div class="sub" style="margin-bottom:10px">As of ${geo.date}</div>`;
       out += geo.groups.map(g=>{
-        let rows = g.rows.map(r=>`<tr><td>${r.name}</td><td>${(r.count||0).toLocaleString()}</td></tr>`).join('');
-        return `<div style="font-family:-apple-system,Helvetica,Arial,sans-serif; font-size:.82rem; font-weight:600; margin:14px 0 4px">${g.title}</div><table><tr><th>Area</th><th>Voters</th></tr>${rows}</table>`;
+        const regMap = Object.keys(REGISTERED).length ? regByField(g.field) : null;
+        let rows = g.rows.map(r=>{
+          const reg = regMap ? (regMap[r.key]||0) : 0;
+          const pct = regMap && reg ? (r.count/reg*100).toFixed(2)+'%' : '—';
+          return `<tr><td>${r.name}</td><td>${(r.count||0).toLocaleString()}</td><td>${pct}</td></tr>`;
+        }).join('');
+        return `<div style="font-family:-apple-system,Helvetica,Arial,sans-serif; font-size:.82rem; font-weight:600; margin:14px 0 4px">${g.title}</div><table><tr><th>Area</th><th>Voters</th><th>% of registered</th></tr>${rows}</table>`;
       }).join('');
       gt.innerHTML = out;
     }
@@ -230,6 +238,11 @@ function main(){
 const COM_COLORS = {"1":"#F0AC42","2":"#504846","3":"#C98A2E","4":"#8C8279"};
 let mapMode = "turnout";
 
+function regByField(field){
+  const m = {};
+  PRECINCTS.forEach(pr => { const k = pr[field]; m[k] = (m[k]||0) + (REGISTERED[pr.p]||0); });
+  return m;
+}
 function leanColor(rStrength){
   // rStrength: Republican two-party vote share, 0-1. Gradient from Dem teal through gray to Rep maroon.
   const t = Math.max(-1, Math.min(1, (rStrength-0.5)*2));
