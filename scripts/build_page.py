@@ -2,7 +2,7 @@
 """Rebuild the data constants inside index.html from the saved daily files (aggregates only). Run from the repo root:
     python3 scripts/build_page.py
 Reads data/daily/day-NN.json (+ locations-day-NN.json) and the latest data/mail/abs-*.json. Everything else in the page is untouched.
-Updates: DATA2026, TURNOUT_BY_PRECINCT, GEO, HIST_EARLY, HIST_METHOD (early parts), HIST_CROSS (early part), PRECINCT_HISTORY, NP_METHOD, NP_BY_PRECINCT, NP_TREND, RETURNING, CATEGORY_BY_DAY, POLL_VOTES, MAIL26.
+Updates: DATA2026, TURNOUT_BY_PRECINCT, GEO, HIST_EARLY, HIST_METHOD (early parts), HIST_CROSS (early part), PRECINCT_HISTORY, NP_METHOD, NP_BY_PRECINCT, NP_BY_DAY, HIST_EARLY_BY_DAY, POLL_BY_DAY, NP_TREND, RETURNING, CATEGORY_BY_DAY, POLL_VOTES, MAIL26.
 """
 import glob, json, re
 from datetime import date
@@ -78,6 +78,17 @@ if rd_files:   # returning voters: retention series by day + the latest full res
         r = json.load(open(f)); rt = r['retention_2026']
         series.append({'day': r['day'], 'label': lab.get(r['day'], ''), 'matched': r['early_voters_matched'], 'e24': rt['early_2024']['share'], 'e22': rt['early_2022']['share'], 'ed24': rt['election_day_2024']['share']})
     put('RETURNING', dump({'days': series, 'latest': json.load(open(rd_files[-1]))}))
+# per-day map data so the map can be shown "as of" any day: no-primary-history counts, early-voter primary-history [n, sum of R shares], and cumulative votes by location
+put('NP_BY_DAY', dump({str(d['day']): {k: v[0] for k, v in d['history_nonprimary']['by_precinct'].items() if v[0]} for d in days if 'history_nonprimary' in d}))
+put('HIST_EARLY_BY_DAY', dump({str(d['day']): {k: [v[0], round(v[1], 2)] for k, v in d.get('history_early', {}).items()} for d in days}))
+_locs = sorted(glob.glob('data/daily/locations-day-*.json'))
+if _locs:
+    _L = json.load(open(_locs[-1])); _pb = {}
+    for _n, _v in _L['locations'].items():
+        _acc, _arr = 0, []
+        for _c in _L['dates']: _acc += _v['by_day'][_c]; _arr.append(_acc)
+        _pb[int(_n)] = _arr
+    put('POLL_BY_DAY', dump(_pb))
 put('PRECINCT_HISTORY', dump([{'day': d['day'], 'label': d['label'], 'p': d['precincts']} for d in days]))
 groups = [("By Commissioner Precinct", "com", "Commissioner Pct"), ("By State Senate District", "sen", "Senate District"), ("By State House District", "hse", "House District"),
           ("By Congressional District", "cong", "Congressional District"), ("By State Board of Education District", "sboe", "SBOE District"), ("By Justice of the Peace Precinct", "jp", "Justice of the Peace Precinct")]

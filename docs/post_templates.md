@@ -20,3 +20,4 @@ before, not how anyone votes in November; Day-1-style early electorates skew hab
 Returning voters (from Day 7 on): scripts/voter_matching.py daily updates the private 2026 early-voter file and writes data/returning/day-NN.json; build_page.py loads them into the site's
 "Returning voters" section; scripts/make_returning_graphic.py makes the post graphic. Quote the headline as "X% of early voters also voted early in 2024" and the retention of 2024's early voters.
 Do NOT present 2022->2024 retention as a benchmark for 2026 (presidential vs midterm) until a 2020 roster (presidential -> midterm 2022) is available.
+Map day controls: build_page.py writes NP_BY_DAY, HIST_EARLY_BY_DAY, POLL_BY_DAY each day; the map's slider/Play/Latest controls use them (turnout, early voters vs precinct base, no primary history, polling locations).
