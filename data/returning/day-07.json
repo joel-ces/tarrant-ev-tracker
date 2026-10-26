@@ -1,0 +1,259 @@
+{
+ "day": 7,
+ "early_voters_matched": 340616,
+ "composition": {
+  "voted_early_2024": 274548,
+  "election_day_2024": 20425,
+  "no_2024_vote": 45643,
+  "voted_early_2022": 196973,
+  "election_day_2022": 41552,
+  "no_2022_vote": 102091,
+  "both_years": 233175,
+  "neither_year": 40293
+ },
+ "retention_2026": {
+  "early_2024": {
+   "pool": 662181,
+   "voted": 274548,
+   "share": 41.5
+  },
+  "in_person_2024": {
+   "pool": 634727,
+   "voted": 262287,
+   "share": 41.3
+  },
+  "mail_2024": {
+   "pool": 27454,
+   "voted": 12261,
+   "share": 44.7
+  },
+  "election_day_2024": {
+   "pool": 162705,
+   "voted": 20425,
+   "share": 12.6
+  },
+  "early_2022": {
+   "pool": 409235,
+   "voted": 196973,
+   "share": 48.1
+  },
+  "election_day_2022": {
+   "pool": 179443,
+   "voted": 41552,
+   "share": 23.2
+  },
+  "early_both": {
+   "pool": 343101,
+   "voted": 189170,
+   "share": 55.1
+  },
+  "voted_2024_not_2022": {
+   "pool": 316482,
+   "voted": 61798,
+   "share": 19.5
+  }
+ },
+ "same_point": {
+  "point_days_out": 9,
+  "early_2022_to_2024": {
+   "pool": 409235,
+   "voted": 240966,
+   "share": 58.9
+  },
+  "early_2024_to_2026": {
+   "pool": 662181,
+   "voted": 274548,
+   "share": 41.5
+  },
+  "election_day_2022_to_2024": {
+   "pool": 179443,
+   "voted": 49282,
+   "share": 27.5
+  },
+  "election_day_2024_to_2026": {
+   "pool": 162705,
+   "voted": 20425,
+   "share": 12.6
+  }
+ },
+ "by_past_day": [
+  {
+   "days_out": 15,
+   "in_person_2024": {
+    "pool": 57914,
+    "voted": 37206,
+    "share": 64.2
+   },
+   "in_person_2022_to_2024": {
+    "pool": 29196,
+    "voted": 21883,
+    "share": 75.0
+   }
+  },
+  {
+   "days_out": 14,
+   "in_person_2024": {
+    "pool": 57388,
+    "voted": 33439,
+    "share": 58.3
+   },
+   "in_person_2022_to_2024": {
+    "pool": 34739,
+    "voted": 25080,
+    "share": 72.2
+   }
+  },
+  {
+   "days_out": 13,
+   "in_person_2024": {
+    "pool": 55696,
+    "voted": 29524,
+    "share": 53.0
+   },
+   "in_person_2022_to_2024": {
+    "pool": 32853,
+    "voted": 22641,
+    "share": 68.9
+   }
+  },
+  {
+   "days_out": 12,
+   "in_person_2024": {
+    "pool": 54847,
+    "voted": 26194,
+    "share": 47.8
+   },
+   "in_person_2022_to_2024": {
+    "pool": 31020,
+    "voted": 20356,
+    "share": 65.6
+   }
+  },
+  {
+   "days_out": 11,
+   "in_person_2024": {
+    "pool": 60210,
+    "voted": 26964,
+    "share": 44.8
+   },
+   "in_person_2022_to_2024": {
+    "pool": 29653,
+    "voted": 18884,
+    "share": 63.7
+   }
+  },
+  {
+   "days_out": 10,
+   "in_person_2024": {
+    "pool": 81200,
+    "voted": 36661,
+    "share": 45.1
+   },
+   "in_person_2022_to_2024": {
+    "pool": 30043,
+    "voted": 19889,
+    "share": 66.2
+   }
+  },
+  {
+   "days_out": 9,
+   "in_person_2024": {
+    "pool": 0,
+    "voted": 0,
+    "share": 0.0
+   },
+   "in_person_2022_to_2024": {
+    "pool": 11540,
+    "voted": 7330,
+    "share": 63.5
+   }
+  },
+  {
+   "days_out": 8,
+   "in_person_2024": {
+    "pool": 57927,
+    "voted": 20159,
+    "share": 34.8
+   },
+   "in_person_2022_to_2024": {
+    "pool": 32876,
+    "voted": 18858,
+    "share": 57.4
+   }
+  },
+  {
+   "days_out": 7,
+   "in_person_2024": {
+    "pool": 51852,
+    "voted": 15500,
+    "share": 29.9
+   },
+   "in_person_2022_to_2024": {
+    "pool": 32483,
+    "voted": 17290,
+    "share": 53.2
+   }
+  },
+  {
+   "days_out": 6,
+   "in_person_2024": {
+    "pool": 48050,
+    "voted": 12614,
+    "share": 26.3
+   },
+   "in_person_2022_to_2024": {
+    "pool": 33125,
+    "voted": 16522,
+    "share": 49.9
+   }
+  },
+  {
+   "days_out": 5,
+   "in_person_2024": {
+    "pool": 44832,
+    "voted": 10558,
+    "share": 23.6
+   },
+   "in_person_2022_to_2024": {
+    "pool": 40024,
+    "voted": 18313,
+    "share": 45.8
+   }
+  },
+  {
+   "days_out": 4,
+   "in_person_2024": {
+    "pool": 64809,
+    "voted": 13467,
+    "share": 20.8
+   },
+   "in_person_2022_to_2024": {
+    "pool": 51753,
+    "voted": 21137,
+    "share": 40.8
+   }
+  }
+ ],
+ "method_grid_2026_by_2024": {
+  "EV": {
+   "EV": 257309,
+   "none": 43329,
+   "ED": 20090,
+   "BM": 2762
+  },
+  "BM": {
+   "BM": 9499,
+   "EV": 4978,
+   "none": 2314,
+   "ED": 335
+  }
+ },
+ "timing_in_person_returners": {
+  "n": 257309,
+  "median_days_earlier": 1.0,
+  "earlier_2plus": 41.7,
+  "same_within_1": 41.7,
+  "later_2plus": 16.6,
+  "caveat": "only voters already voted by this day, so censored toward early"
+ }
+}
