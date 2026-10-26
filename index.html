@@ -140,6 +140,17 @@ footer{font-family:-apple-system,Helvetica,Arial,sans-serif; font-size:.75rem; c
   </section>
 
   <section>
+    <h2>Returning voters: how they voted in 2022 and 2024</h2>
+    <div class="tiltnote" id="retSummary" style="display:none; margin-top:0"></div>
+    <div id="retComp"></div>
+    <div id="retLine"></div>
+    <div id="retByDay"></div>
+    <div class="mapnote" id="retTiming" style="margin-top:8px"></div>
+    <div class="tablewrap" id="retGrid"></div>
+    <div class="tablewrap" id="retPool"></div>
+  </section>
+
+  <section>
     <h2>Turnout by voter primary history</h2>
     <div class="maptools" id="histTierTools"></div>
     <div id="histTierChart"></div>
@@ -333,6 +344,7 @@ function main(){
   renderNonPrimary();
   renderCategoryDays();
   renderNoPrimary();
+  renderReturning();
 }
 
 const COM_COLORS = {"1":"#F0AC42","2":"#504846","3":"#C98A2E","4":"#8C8279"};
@@ -378,6 +390,8 @@ const NP_BY_PRECINCT = {"1005":[39,0],"1006":[115,0],"1008":[17,0],"1010":[37,0]
 const CATEGORY_BY_DAY = [{"day":1,"label":"Oct 19","t":[30460,20175,11709],"i":[25139,15868,9402],"m":[5321,4307,2307]},{"day":2,"label":"Oct 20","t":[53031,38139,22336],"i":[47674,33784,19967],"m":[5357,4355,2369]},{"day":3,"label":"Oct 21","t":[72943,57143,34038],"i":[66905,52100,31349],"m":[6038,5043,2689]},{"day":4,"label":"Oct 22","t":[90005,75472,46197],"i":[83537,69963,43219],"m":[6468,5509,2978]},{"day":5,"label":"Oct 23","t":[108739,93488,61780],"i":[101781,87434,58453],"m":[6958,6054,3327]},{"day":6,"label":"Oct 24","t":[128811,108159,79097],"i":[121504,101737,75505],"m":[7307,6422,3592]},{"day":7,"label":"Oct 25","t":[136958,115753,88154],"i":[129651,109331,84562],"m":[7307,6422,3592]}];
 // Precinct-lean tilt by day for early voters with no primary history (npt) and with a primary history (prt), vs. each group's registered base. Rebuilt daily.
 const NP_TREND = [{"day":1,"label":"Oct 19","npl":4.5,"npt":5.5,"prl":4.2,"prt":-1.7},{"day":2,"label":"Oct 20","npl":3.8,"npt":4.9,"prl":4.7,"prt":-1.1},{"day":3,"label":"Oct 21","npl":3.3,"npt":4.4,"prl":5.3,"prt":-0.5},{"day":4,"label":"Oct 22","npl":3.2,"npt":4.3,"prl":5.8,"prt":-0.0},{"day":5,"label":"Oct 23","npl":3.4,"npt":4.4,"prl":6.1,"prt":0.2},{"day":6,"label":"Oct 24","npl":3.0,"npt":4.0,"prl":5.7,"prt":-0.1},{"day":7,"label":"Oct 25","npl":3.1,"npt":4.1,"prl":5.8,"prt":-0.1}];
+// Returning voters: matches 2026 early voters to how and when they voted in 2022 and 2024 (voter IDs stay private; these are totals). Rebuilt daily.
+const RETURNING = {"days":[{"day":1,"label":"Oct 19","matched":62024,"e24":7.9,"e22":9.8,"ed24":1.5},{"day":2,"label":"Oct 20","matched":113187,"e24":14.4,"e22":17.7,"ed24":3.1},{"day":3,"label":"Oct 21","matched":163836,"e24":20.7,"e22":25.3,"ed24":4.8},{"day":4,"label":"Oct 22","matched":211388,"e24":26.5,"e22":32.1,"ed24":6.6},{"day":5,"label":"Oct 23","matched":263740,"e24":32.8,"e22":39.0,"ed24":8.7},{"day":6,"label":"Oct 24","matched":315817,"e24":38.6,"e22":45.2,"ed24":11.3},{"day":7,"label":"Oct 25","matched":340616,"e24":41.5,"e22":48.1,"ed24":12.6}],"latest":{"day":7,"early_voters_matched":340616,"composition":{"voted_early_2024":274548,"election_day_2024":20425,"no_2024_vote":45643,"voted_early_2022":196973,"election_day_2022":41552,"no_2022_vote":102091,"both_years":233175,"neither_year":40293},"retention_2026":{"early_2024":{"pool":662181,"voted":274548,"share":41.5},"in_person_2024":{"pool":634727,"voted":262287,"share":41.3},"mail_2024":{"pool":27454,"voted":12261,"share":44.7},"election_day_2024":{"pool":162705,"voted":20425,"share":12.6},"early_2022":{"pool":409235,"voted":196973,"share":48.1},"election_day_2022":{"pool":179443,"voted":41552,"share":23.2},"early_both":{"pool":343101,"voted":189170,"share":55.1},"voted_2024_not_2022":{"pool":316482,"voted":61798,"share":19.5}},"same_point":{"point_days_out":9,"early_2022_to_2024":{"pool":409235,"voted":240966,"share":58.9},"early_2024_to_2026":{"pool":662181,"voted":274548,"share":41.5},"election_day_2022_to_2024":{"pool":179443,"voted":49282,"share":27.5},"election_day_2024_to_2026":{"pool":162705,"voted":20425,"share":12.6}},"by_past_day":[{"days_out":15,"in_person_2024":{"pool":57914,"voted":37206,"share":64.2},"in_person_2022_to_2024":{"pool":29196,"voted":21883,"share":75.0}},{"days_out":14,"in_person_2024":{"pool":57388,"voted":33439,"share":58.3},"in_person_2022_to_2024":{"pool":34739,"voted":25080,"share":72.2}},{"days_out":13,"in_person_2024":{"pool":55696,"voted":29524,"share":53.0},"in_person_2022_to_2024":{"pool":32853,"voted":22641,"share":68.9}},{"days_out":12,"in_person_2024":{"pool":54847,"voted":26194,"share":47.8},"in_person_2022_to_2024":{"pool":31020,"voted":20356,"share":65.6}},{"days_out":11,"in_person_2024":{"pool":60210,"voted":26964,"share":44.8},"in_person_2022_to_2024":{"pool":29653,"voted":18884,"share":63.7}},{"days_out":10,"in_person_2024":{"pool":81200,"voted":36661,"share":45.1},"in_person_2022_to_2024":{"pool":30043,"voted":19889,"share":66.2}},{"days_out":9,"in_person_2024":{"pool":0,"voted":0,"share":0.0},"in_person_2022_to_2024":{"pool":11540,"voted":7330,"share":63.5}},{"days_out":8,"in_person_2024":{"pool":57927,"voted":20159,"share":34.8},"in_person_2022_to_2024":{"pool":32876,"voted":18858,"share":57.4}},{"days_out":7,"in_person_2024":{"pool":51852,"voted":15500,"share":29.9},"in_person_2022_to_2024":{"pool":32483,"voted":17290,"share":53.2}},{"days_out":6,"in_person_2024":{"pool":48050,"voted":12614,"share":26.3},"in_person_2022_to_2024":{"pool":33125,"voted":16522,"share":49.9}},{"days_out":5,"in_person_2024":{"pool":44832,"voted":10558,"share":23.6},"in_person_2022_to_2024":{"pool":40024,"voted":18313,"share":45.8}},{"days_out":4,"in_person_2024":{"pool":64809,"voted":13467,"share":20.8},"in_person_2022_to_2024":{"pool":51753,"voted":21137,"share":40.8}}],"method_grid_2026_by_2024":{"EV":{"EV":257309,"none":43329,"ED":20090,"BM":2762},"BM":{"BM":9499,"EV":4978,"none":2314,"ED":335}},"timing_in_person_returners":{"n":257309,"median_days_earlier":1.0,"earlier_2plus":41.7,"same_within_1":41.7,"later_2plus":16.6,"caveat":"only voters already voted by this day, so censored toward early"}}};
 function histSum(src, filter){
   const a = [0,0,0,0,0,0,0];
   PRECINCTS.forEach(pr=>{ if(!filter(pr)) return; const v = src[pr.p]; if(!v) return; for(let i=0;i<7;i++) a[i] += v[i]; });
@@ -697,6 +711,61 @@ function renderNoPrimary(){
   svg += line('npt', 'var(--accent)', 'No primary history') + line('prt', 'var(--accent2)', 'On the primary-history list (any party)');
   svg += `<text x="${(L+W-Rr)/2}" y="${H-4}" text-anchor="middle" font-size="12" style="fill:var(--ink)">Day of early voting</text><text transform="translate(12 ${(H-B+T)/2}) rotate(-90)" text-anchor="middle" font-size="12" style="fill:var(--ink)">Points toward R (+) or D (\u2212)</text></svg>`;
   tr.innerHTML = `<div style="font-family:-apple-system,Helvetica,Arial,sans-serif; font-size:.82rem; font-weight:600; margin:18px 0 6px">Precinct-lean tilt by day</div>` + svg + `<div class="legend"><span><i class="dot" style="background:var(--accent)"></i>No primary history</span><span><i class="dot" style="background:var(--accent2)"></i>On the primary-history list (any party)</span></div><div class="mapnote">How much more Republican-leaning (above zero) or Democratic-leaning (below zero) the precincts of each group's early voters are than that group's registered base, using all early votes to date. Both lines show where these voters live, based on past precinct results. They do not use anyone's own primary votes. "On the primary-history list" means the voter has voted in a Democratic or Republican primary since 2016.</div>`;
+}
+
+function renderReturning(){
+  const ids = ['retSummary','retComp','retLine','retByDay','retTiming','retGrid','retPool'].reduce((o,k)=>(o[k]=document.getElementById(k), o), {});
+  const R = RETURNING;
+  if(!R.days || !R.days.length){ ids.retSummary.style.display = 'none'; ids.retComp.innerHTML = EMPTY_MSG; ['retLine','retByDay','retTiming','retGrid','retPool'].forEach(k=>ids[k].innerHTML = ''); return; }
+  const L = R.latest, n = L.early_voters_matched, c = L.composition, rt = L.retention_2026, pc = x => (x/n*100), f0 = x => x.toFixed(0) + '%', f1 = x => x.toFixed(1) + '%', ok = ['#504846','#F0AC42','#D9D4C7'];
+  ids.retSummary.style.display = '';
+  ids.retSummary.innerHTML = `<b>${f0(pc(c.voted_early_2024))} of early voters so far also voted early in 2024, and ${f0(pc(c.both_years))} voted in both 2022 and 2024.</b> ${f0(pc(c.neither_year))} voted in neither year.<small>Based on ${n.toLocaleString()} early voters with a usable voter ID, matched to the Tarrant County rosters for November 2022 and November 2024. "Early" means in-person early voting or a mail ballot. People who didn't vote in a year may not have been registered then, so "did not vote" also includes new registrants and movers. Voters with redacted IDs can't be matched.</small>`;
+  const bars = [["How they voted in 2024", [c.voted_early_2024, c.election_day_2024, c.no_2024_vote], ["Voted early","Voted on Election Day","Did not vote"], ok],
+                ["How they voted in 2022", [c.voted_early_2022, c.election_day_2022, c.no_2022_vote], ["Voted early","Voted on Election Day","Did not vote"], ok],
+                ["Voted in 2022 and 2024", [c.both_years, n - c.both_years - c.neither_year, c.neither_year], ["Both years","One of the two years","Neither year"], ['#504846','#8C8279','#F0AC42']]];
+  ids.retComp.innerHTML = bars.map(([label, v, names, cols])=>`<div class="mixrow"><div>${label}<br><span style="color:var(--muted); font-size:.72rem">${n.toLocaleString()} early voters</span></div><div style="display:flex; height:22px; border:1px solid var(--line)">${v.map((x,i)=>{ const p = x/n*100; return `<div title="${names[i]}: ${p.toFixed(1)}% (${x.toLocaleString()})" style="width:${p}%; background:${cols[i]}; color:${(i===0 && cols[0] === '#504846') ? '#fff' : '#3A332F'}; font-size:.7rem; text-align:center; line-height:22px; overflow:hidden;">${p >= 6 ? Math.round(p)+'%' : ''}</div>`; }).join('')}</div></div>`).join('')
+    + `<div class="legend">${['Voted early / both years','Voted on Election Day / one year','Did not vote / neither year'].map((t,i)=>`<span><i class="dot" style="background:${['#504846','#F0AC42','#D9D4C7'][i]}"></i>${t}</span>`).join('')}</div>`;
+
+  // retention by day
+  const W = 880, H = 270, Lm = 50, Rm = 150, T = 16, B = 38, nD = 12, series = [['e24','2024 early voters','#504846',''],['e22','2022 early voters','#F0AC42',''],['ed24','2024 Election Day voters','#8C8279','5 4']];
+  const top = Math.max(...R.days.flatMap(d=>[d.e24, d.e22, d.ed24])), step = niceStep(top), maxY = Math.ceil(top/step)*step;
+  const X = d => Lm + (d-1)*(W-Lm-Rm)/(nD-1), Y = v => H-B - v/maxY*(H-T-B);
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Share of past voters who have voted early in 2026, by day">`;
+  for(let t = 0; t <= maxY + .01; t += step) svg += `<line x1="${Lm}" y1="${Y(t)}" x2="${W-Rm}" y2="${Y(t)}" style="stroke:var(--line)" stroke-width="1"/><text x="${Lm-6}" y="${Y(t)+4}" text-anchor="end" font-size="11" style="fill:var(--muted)">${t}%</text>`;
+  for(let d = 1; d <= nD; d++) svg += `<text x="${X(d)}" y="${H-B+16}" text-anchor="middle" font-size="11" style="fill:var(--muted)">${d}</text>`;
+  svg += `<text x="${(Lm+W-Rm)/2}" y="${H-4}" text-anchor="middle" font-size="12" style="fill:var(--ink)">Day of early voting</text>`;
+  series.forEach(([k, name, col, dash])=>{
+    const pts = R.days.map(d=>[X(d.day), Y(d[k]), d]);
+    if(pts.length > 1) svg += `<path d="${pts.map((q,i)=>(i ? 'L' : 'M') + q[0] + ',' + q[1]).join(' ')}" fill="none" style="stroke:${col}" stroke-width="2.4" ${dash ? 'stroke-dasharray="' + dash + '"' : ''}/>`;
+    svg += pts.map(q=>`<circle cx="${q[0]}" cy="${q[1]}" r="3.5" style="fill:${col}"><title>${name}, ${q[2].label}: ${q[2][k].toFixed(1)}% have voted early</title></circle>`).join('');
+    const l = pts[pts.length-1]; svg += `<text x="${l[0]+8}" y="${l[1]+4}" font-size="11" font-weight="700" style="fill:${col === '#F0AC42' ? '#B9801E' : col}">${l[2][k].toFixed(1)}% ${name}</text>`;
+  });
+  ids.retLine.innerHTML = `<div style="font-family:-apple-system,Helvetica,Arial,sans-serif; font-size:.82rem; font-weight:600; margin:18px 0 6px">Share of past voters who have voted early in 2026, by day</div>` + svg + '</svg>'
+    + `<div class="mapnote">Each point is the share of that group's ${rt.early_2024.pool.toLocaleString()} (2024 early), ${rt.early_2022.pool.toLocaleString()} (2022 early) or ${rt.election_day_2024.pool.toLocaleString()} (2024 Election Day) voters who had voted early in 2026 through that day. The groups include people who have since moved or left the rolls.</div>`;
+
+  // retention by the day they voted in 2024
+  const bd = L.by_past_day, bw = (880-60-20)/12, H2 = 270, Y2 = v => H2-44 - v/80*(H2-44-16);
+  let s2 = `<svg viewBox="0 0 880 ${H2}" role="img" aria-label="Share of 2024 in-person early voters who have voted early in 2026, by the day they voted in 2024">`;
+  [0,20,40,60,80].forEach(t=>{ s2 += `<line x1="60" y1="${Y2(t)}" x2="860" y2="${Y2(t)}" style="stroke:var(--line)" stroke-width="1"/><text x="54" y="${Y2(t)+4}" text-anchor="end" font-size="11" style="fill:var(--muted)">${t}%</text>`; });
+  bd.forEach((d,i)=>{ const x = 60 + i*bw + bw*0.18, w = bw*0.64, v = d.in_person_2024.share;
+    if(d.in_person_2024.pool > 0){ s2 += `<rect x="${x}" y="${Y2(v)}" width="${w}" height="${H2-44-Y2(v)}" style="fill:var(--accent2)"><title>${d.days_out} days before Election Day in 2024: ${d.in_person_2024.pool.toLocaleString()} in-person voters, ${v.toFixed(1)}% have voted early in 2026</title></rect><text x="${x+w/2}" y="${Y2(v)-5}" text-anchor="middle" font-size="11" font-weight="700" style="fill:var(--ink)">${v.toFixed(0)}%</text>`; }
+    else s2 += `<text x="${x+w/2}" y="${H2-52}" text-anchor="middle" font-size="9" style="fill:var(--muted)">no voting</text>`;
+    s2 += `<text x="${x+w/2}" y="${H2-26}" text-anchor="middle" font-size="11" style="fill:var(--muted)">${d.days_out}</text>`; });
+  const ctx = bd.filter(d=>d.in_person_2022_to_2024.pool > 0);
+  s2 += `<path d="${ctx.map((d,k)=>(k ? 'L' : 'M') + (60 + bd.indexOf(d)*bw + bw/2) + ',' + Y2(d.in_person_2022_to_2024.share)).join(' ')}" fill="none" style="stroke:var(--accent)" stroke-width="2" stroke-dasharray="5 4"/>`
+    + ctx.map(d=>`<circle cx="${60 + bd.indexOf(d)*bw + bw/2}" cy="${Y2(d.in_person_2022_to_2024.share)}" r="3" style="fill:var(--accent)"><title>2022 in-person voters ${d.days_out} days out: ${d.in_person_2022_to_2024.share.toFixed(1)}% had voted early in 2024 by the same point</title></circle>`).join('')
+    + `<text x="460" y="${H2-6}" text-anchor="middle" font-size="12" style="fill:var(--ink)">Days before Election Day when they voted in person in 2024</text></svg>`;
+  ids.retByDay.innerHTML = `<div style="font-family:-apple-system,Helvetica,Arial,sans-serif; font-size:.82rem; font-weight:600; margin:18px 0 6px">Share of 2024 in-person early voters who have voted early in 2026, by when they voted in 2024</div>` + s2
+    + `<div class="legend"><span><i class="dot" style="background:var(--accent2)"></i>2024 voters, 2026 so far</span><span><i class="dot" style="background:var(--accent)"></i>For context: 2022 voters in 2024 by the same point (a presidential year)</span></div><div class="mapnote">People who voted early in 2024 are more likely to have voted already. 2026 early voting is only partly done, so people who voted late in 2024 have had less time to vote again; this will rise. The dashed line is context only: 2024 was a presidential election, so it is not a like-for-like benchmark.</div>`;
+
+  const t = L.timing_in_person_returners;
+  ids.retTiming.innerHTML = `Of the ${t.n.toLocaleString()} returning voters who voted in person early in both years, ${t.earlier_2plus}% are voting at least two days earlier than they did in 2024, ${t.same_within_1}% within a day of it, and ${t.later_2plus}% at least two days later. This counts only people who have already voted, so it leans early.`;
+
+  const g = L.method_grid_2026_by_2024, cols2 = [['EV','Early in person in 2024'],['BM','Mail in 2024'],['ED','Election Day 2024'],['none','Did not vote in 2024']];
+  ids.retGrid.innerHTML = `<div style="font-family:-apple-system,Helvetica,Arial,sans-serif; font-size:.82rem; font-weight:600; margin:18px 0 6px">How 2026's early voters voted in 2024</div><table><tr><th>2026 early voters</th>${cols2.map(x=>`<th>${x[1]}</th>`).join('')}</tr>${[['EV','Voted early in person'],['BM','Voted by mail']].map(([k,lab])=>{ const tot = Object.values(g[k]).reduce((a,b)=>a+b,0); return `<tr><td>${lab} (${tot.toLocaleString()})</td>${cols2.map(([kk])=>`<td>${((g[k][kk]||0)/tot*100).toFixed(1)}% <span style="color:var(--muted)">(${(g[k][kk]||0).toLocaleString()})</span></td>`).join('')}</tr>`; }).join('')}</table>`;
+
+  const pr = [['2024 early voters', rt.early_2024], ['2024 Election Day voters', rt.election_day_2024], ['2022 early voters', rt.early_2022], ['Early voters in both 2022 and 2024', rt.early_both]];
+  ids.retPool.innerHTML = `<div style="font-family:-apple-system,Helvetica,Arial,sans-serif; font-size:.82rem; font-weight:600; margin:18px 0 6px">Who has voted so far, and who is still to vote</div><table><tr><th>Past voters</th><th>Number</th><th>Voted early in 2026</th><th>Share</th><th>Not yet voted</th></tr>${pr.map(([name, x])=>`<tr><td>${name}</td><td>${x.pool.toLocaleString()}</td><td>${x.voted.toLocaleString()}</td><td>${x.share.toFixed(1)}%</td><td>${(x.pool - x.voted).toLocaleString()}</td></tr>`).join('')}</table><div class="mapnote">"Not yet voted" includes people who have moved, died or left the rolls, and people who will vote on Election Day. It is not a count of voters still to come.</div>`;
 }
 
 function regByField(field){

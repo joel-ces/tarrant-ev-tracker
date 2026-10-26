@@ -2,7 +2,7 @@
 """Rebuild the data constants inside index.html from the saved daily files (aggregates only). Run from the repo root:
     python3 scripts/build_page.py
 Reads data/daily/day-NN.json (+ locations-day-NN.json) and the latest data/mail/abs-*.json. Everything else in the page is untouched.
-Updates: DATA2026, TURNOUT_BY_PRECINCT, GEO, HIST_EARLY, HIST_METHOD (early parts), HIST_CROSS (early part), PRECINCT_HISTORY, NP_METHOD, NP_BY_PRECINCT, NP_TREND, CATEGORY_BY_DAY, POLL_VOTES, MAIL26.
+Updates: DATA2026, TURNOUT_BY_PRECINCT, GEO, HIST_EARLY, HIST_METHOD (early parts), HIST_CROSS (early part), PRECINCT_HISTORY, NP_METHOD, NP_BY_PRECINCT, NP_TREND, RETURNING, CATEGORY_BY_DAY, POLL_VOTES, MAIL26.
 """
 import glob, json, re
 from datetime import date
@@ -71,6 +71,13 @@ if all('history_nonprimary' in d and d.get('history_early') for d in days):   # 
         ln = mrg(sum(P.get(p, [0])[0] * LEAN[p] for p in okp) / sum(P.get(p, [0])[0] for p in okp)); lp = mrg(sum(HEd.get(p, [0])[0] * LEAN[p] for p in okp) / sum(HEd.get(p, [0])[0] for p in okp))
         trend.append({'day': d['day'], 'label': MONTH(d['snapshot_date']), 'npl': round(ln, 1), 'npt': round(ln - b_np, 1), 'prl': round(lp, 1), 'prt': round(lp - b_pr, 1)})
     put('NP_TREND', dump(trend))
+rd_files = sorted(glob.glob('data/returning/day-*.json'))
+if rd_files:   # returning voters: retention series by day + the latest full result (aggregates only)
+    lab = {d['day']: MONTH(d['snapshot_date']) for d in days}; series = []
+    for f in rd_files:
+        r = json.load(open(f)); rt = r['retention_2026']
+        series.append({'day': r['day'], 'label': lab.get(r['day'], ''), 'matched': r['early_voters_matched'], 'e24': rt['early_2024']['share'], 'e22': rt['early_2022']['share'], 'ed24': rt['election_day_2024']['share']})
+    put('RETURNING', dump({'days': series, 'latest': json.load(open(rd_files[-1]))}))
 put('PRECINCT_HISTORY', dump([{'day': d['day'], 'label': d['label'], 'p': d['precincts']} for d in days]))
 groups = [("By Commissioner Precinct", "com", "Commissioner Pct"), ("By State Senate District", "sen", "Senate District"), ("By State House District", "hse", "House District"),
           ("By Congressional District", "cong", "Congressional District"), ("By State Board of Education District", "sboe", "SBOE District"), ("By Justice of the Peace Precinct", "jp", "Justice of the Peace Precinct")]
