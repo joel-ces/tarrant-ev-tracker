@@ -21,3 +21,4 @@ Returning voters (from Day 7 on): scripts/voter_matching.py daily updates the pr
 "Returning voters" section; scripts/make_returning_graphic.py makes the post graphic. Quote the headline as "X% of early voters also voted early in 2024" and the retention of 2024's early voters.
 Do NOT present 2022->2024 retention as a benchmark for 2026 (presidential vs midterm) until a 2020 roster (presidential -> midterm 2022) is available.
 Map day controls: build_page.py writes NP_BY_DAY, HIST_EARLY_BY_DAY, POLL_BY_DAY each day; the map's slider/Play/Latest controls use them (turnout, early voters vs precinct base, no primary history, polling locations).
+Registration rolls: scripts/registration_rolls.py builds the private compact file (rolls_compact.csv.gz) from the raw rolls; use it for age bands, registration cohorts, general-election record back to 2016, and retention among still-registered voters.
