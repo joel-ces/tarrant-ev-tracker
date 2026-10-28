@@ -151,6 +151,16 @@ footer{font-family:-apple-system,Helvetica,Arial,sans-serif; font-size:.75rem; c
   </section>
 
   <section>
+    <h2>Voter profile: age, registration and general-election record</h2>
+    <div class="tiltnote" id="profSummary" style="display:none; margin-top:0"></div>
+    <div class="tablewrap" id="profAge"></div>
+    <div class="tablewrap" id="profReg"></div>
+    <div class="tablewrap" id="profGen"></div>
+    <div class="tablewrap" id="profNew"></div>
+    <div id="profTrend"></div>
+  </section>
+
+  <section>
     <h2>Turnout by voter primary history</h2>
     <div class="maptools" id="histTierTools"></div>
     <div id="histTierChart"></div>
@@ -349,6 +359,7 @@ function main(){
   renderCategoryDays();
   renderNoPrimary();
   renderReturning();
+  renderProfile();
 }
 
 const COM_COLORS = {"1":"#F0AC42","2":"#504846","3":"#C98A2E","4":"#8C8279"};
@@ -396,6 +407,8 @@ const CATEGORY_BY_DAY = [{"day":1,"label":"Oct 19","t":[30460,20175,11709],"i":[
 const NP_TREND = [{"day":1,"label":"Oct 19","npl":4.5,"npt":5.5,"prl":4.2,"prt":-1.7},{"day":2,"label":"Oct 20","npl":3.8,"npt":4.9,"prl":4.7,"prt":-1.1},{"day":3,"label":"Oct 21","npl":3.3,"npt":4.4,"prl":5.3,"prt":-0.5},{"day":4,"label":"Oct 22","npl":3.2,"npt":4.3,"prl":5.8,"prt":-0.0},{"day":5,"label":"Oct 23","npl":3.4,"npt":4.4,"prl":6.1,"prt":0.2},{"day":6,"label":"Oct 24","npl":3.0,"npt":4.0,"prl":5.7,"prt":-0.1},{"day":7,"label":"Oct 25","npl":3.1,"npt":4.1,"prl":5.8,"prt":-0.1},{"day":8,"label":"Oct 26","npl":3.0,"npt":4.0,"prl":6.0,"prt":0.1},{"day":9,"label":"Oct 27","npl":2.9,"npt":4.0,"prl":6.2,"prt":0.3}];
 // Returning voters: matches 2026 early voters to how and when they voted in 2022 and 2024 (voter IDs stay private; these are totals). Rebuilt daily.
 const RETURNING = {"days":[{"day":1,"label":"Oct 19","matched":62024,"e24":7.9,"e22":9.8,"ed24":1.5},{"day":2,"label":"Oct 20","matched":113187,"e24":14.4,"e22":17.7,"ed24":3.1},{"day":3,"label":"Oct 21","matched":163836,"e24":20.7,"e22":25.3,"ed24":4.8},{"day":4,"label":"Oct 22","matched":211388,"e24":26.5,"e22":32.1,"ed24":6.6},{"day":5,"label":"Oct 23","matched":263740,"e24":32.8,"e22":39.0,"ed24":8.7},{"day":6,"label":"Oct 24","matched":315817,"e24":38.6,"e22":45.2,"ed24":11.3},{"day":7,"label":"Oct 25","matched":340616,"e24":41.5,"e22":48.1,"ed24":12.6},{"day":8,"label":"Oct 26","matched":391064,"e24":47.2,"e22":54.1,"ed24":15.2},{"day":9,"label":"Oct 27","matched":437188,"e24":52.3,"e22":59.3,"ed24":17.9}],"latest":{"day":9,"early_voters_matched":437188,"composition":{"voted_early_2024":346202,"election_day_2024":29192,"no_2024_vote":61794,"voted_early_2022":242720,"election_day_2022":57116,"no_2022_vote":137352,"both_years":292714,"neither_year":54672},"retention_2026":{"early_2024":{"pool":662181,"voted":346202,"share":52.3},"in_person_2024":{"pool":634727,"voted":332718,"share":52.4},"mail_2024":{"pool":27454,"voted":13484,"share":49.1},"election_day_2024":{"pool":162705,"voted":29192,"share":17.9},"early_2022":{"pool":409235,"voted":242720,"share":59.3},"election_day_2022":{"pool":179443,"voted":57116,"share":31.8},"early_both":{"pool":343101,"voted":232273,"share":67.7},"voted_2024_not_2022":{"pool":316482,"voted":82680,"share":26.1}},"same_point":{"point_days_out":7,"early_2022_to_2024":{"pool":409235,"voted":292495,"share":71.5},"early_2024_to_2026":{"pool":662181,"voted":346202,"share":52.3},"election_day_2022_to_2024":{"pool":179443,"voted":69834,"share":38.9},"election_day_2024_to_2026":{"pool":162705,"voted":29192,"share":17.9}},"by_past_day":[{"days_out":15,"in_person_2024":{"pool":57914,"voted":42091,"share":72.7},"in_person_2022_to_2024":{"pool":29196,"voted":24293,"share":83.2}},{"days_out":14,"in_person_2024":{"pool":57388,"voted":39693,"share":69.2},"in_person_2022_to_2024":{"pool":34739,"voted":28303,"share":81.5}},{"days_out":13,"in_person_2024":{"pool":55696,"voted":36052,"share":64.7},"in_person_2022_to_2024":{"pool":32853,"voted":26162,"share":79.6}},{"days_out":12,"in_person_2024":{"pool":54847,"voted":33097,"share":60.3},"in_person_2022_to_2024":{"pool":31020,"voted":24191,"share":78.0}},{"days_out":11,"in_person_2024":{"pool":60210,"voted":33619,"share":55.8},"in_person_2022_to_2024":{"pool":29653,"voted":22568,"share":76.1}},{"days_out":10,"in_person_2024":{"pool":81200,"voted":44933,"share":55.3},"in_person_2022_to_2024":{"pool":30043,"voted":22947,"share":76.4}},{"days_out":9,"in_person_2024":{"pool":0,"voted":0,"share":0.0},"in_person_2022_to_2024":{"pool":11540,"voted":8577,"share":74.3}},{"days_out":8,"in_person_2024":{"pool":57927,"voted":28471,"share":49.1},"in_person_2022_to_2024":{"pool":32876,"voted":23924,"share":72.8}},{"days_out":7,"in_person_2024":{"pool":51852,"voted":22514,"share":43.4},"in_person_2022_to_2024":{"pool":32483,"voted":22546,"share":69.4}},{"days_out":6,"in_person_2024":{"pool":48050,"voted":18181,"share":37.8},"in_person_2022_to_2024":{"pool":33125,"voted":21863,"share":66.0}},{"days_out":5,"in_person_2024":{"pool":44832,"voted":15114,"share":33.7},"in_person_2022_to_2024":{"pool":40024,"voted":24747,"share":61.8}},{"days_out":4,"in_person_2024":{"pool":64809,"voted":18951,"share":29.2},"in_person_2022_to_2024":{"pool":51753,"voted":28560,"share":55.2}}],"method_grid_2026_by_2024":{"EV":{"EV":327265,"none":59169,"ED":28810,"BM":3402},"BM":{"BM":10082,"EV":5453,"none":2625,"ED":382}},"timing_in_person_returners":{"n":327265,"median_days_earlier":0.0,"earlier_2plus":36.7,"same_within_1":38.3,"later_2plus":25.0,"caveat":"only voters already voted by this day, so censored toward early"}}};
+// Voter profile totals from the registration rolls (age on Election Day, registration date, general-election record 2016-2024, first-time voters). Totals only. Rebuilt daily.
+const PROFILE = {"day":9,"registered_total":1358207,"early_total":437188,"early_on_rolls":434128,"early_not_on_rolls":3060,"age":{"registered":{"Under 18":69,"18-24":158191,"25-34":257697,"35-44":238755,"45-54":210239,"55-64":206385,"65+":286828,"Unknown":43},"early":{"Under 18":2,"18-24":28405,"25-34":47750,"35-44":56754,"45-54":67579,"55-64":86076,"65+":147545,"Unknown":17}},"registration":{"registered":{"Before 2016":554199,"2016-2019":216688,"2020 to the 2022 general":236577,"After the 2022 general, before the 2024 general":183754,"Since the 2024 general":165362,"Unknown":1627},"early":{"Before 2016":249143,"2016-2019":59832,"2020 to the 2022 general":54103,"After the 2022 general, before the 2024 general":36441,"Since the 2024 general":34352,"Unknown":257}},"generals":{"registered":{"0":372369,"1":208000,"2":149061,"3":148663,"4":150095,"5":330019},"early":{"0":31571,"1":35648,"2":35287,"3":48642,"4":64526,"5":218454}},"new_voters":{"new_registrants_registered":165362,"new_registrants_early":34352,"no_general_registered":372369,"no_general_early":31571,"no_general_new_registrants_early":22519,"no_general_long_registered_early":9052,"no_general_new_registrants_registered":132148,"no_general_long_registered_registered":240221},"first_time_primary":{"any":{"voters":95252,"early":57444,"democratic":69454,"median_age":43.0,"new_registrants":9846},"with_general":{"voters":84866,"early":52042,"democratic":61220,"median_age":45.0,"new_registrants":2663},"no_general":{"voters":10386,"early":5402,"democratic":8234,"median_age":30.0,"new_registrants":7183}},"by_day":[{"day":1,"age":{"Under 18":0,"18-24":2343,"25-34":4570,"35-44":6066,"45-54":7074,"55-64":10895,"65+":30778,"Unknown":2},"new_registrants":3921,"voters":61728},{"day":2,"age":{"Under 18":0,"18-24":2562,"25-34":4657,"35-44":6010,"45-54":6627,"55-64":10155,"65+":20919,"Unknown":3},"new_registrants":3461,"voters":50933},{"day":3,"age":{"Under 18":1,"18-24":2635,"25-34":4743,"35-44":5817,"45-54":6849,"55-64":9561,"65+":20745,"Unknown":1},"new_registrants":3438,"voters":50352},{"day":4,"age":{"Under 18":0,"18-24":2685,"25-34":4759,"35-44":5876,"45-54":6507,"55-64":9032,"65+":18405,"Unknown":1},"new_registrants":3392,"voters":47265},{"day":5,"age":{"Under 18":0,"18-24":3794,"25-34":6497,"35-44":7573,"45-54":8822,"55-64":10509,"65+":14756,"Unknown":3},"new_registrants":4442,"voters":51954},{"day":6,"age":{"Under 18":1,"18-24":4896,"25-34":7393,"35-44":7766,"45-54":10742,"55-64":11732,"65+":9095,"Unknown":2},"new_registrants":4962,"voters":51627},{"day":7,"age":{"Under 18":0,"18-24":2391,"25-34":3154,"35-44":3607,"45-54":5248,"55-64":5524,"65+":4665,"Unknown":0},"new_registrants":2346,"voters":24589},{"day":8,"age":{"Under 18":0,"18-24":3648,"25-34":6165,"35-44":7215,"45-54":8244,"55-64":9867,"65+":14846,"Unknown":3},"new_registrants":4306,"voters":49988},{"day":9,"age":{"Under 18":0,"18-24":3451,"25-34":5812,"35-44":6824,"45-54":7466,"55-64":8801,"65+":13336,"Unknown":2},"new_registrants":4084,"voters":45692}]};
 function histSum(src, filter){
   const a = [0,0,0,0,0,0,0];
   PRECINCTS.forEach(pr=>{ if(!filter(pr)) return; const v = src[pr.p]; if(!v) return; for(let i=0;i<7;i++) a[i] += v[i]; });
@@ -770,6 +783,59 @@ function renderReturning(){
 
   const pr = [['2024 early voters', rt.early_2024], ['2024 Election Day voters', rt.election_day_2024], ['2022 early voters', rt.early_2022], ['Early voters in both 2022 and 2024', rt.early_both]];
   ids.retPool.innerHTML = `<div style="font-family:-apple-system,Helvetica,Arial,sans-serif; font-size:.82rem; font-weight:600; margin:18px 0 6px">Who has voted so far, and who is still to vote</div><table><tr><th>Past voters</th><th>Number</th><th>Voted early in 2026</th><th>Share</th><th>Not yet voted</th></tr>${pr.map(([name, x])=>`<tr><td>${name}</td><td>${x.pool.toLocaleString()}</td><td>${x.voted.toLocaleString()}</td><td>${x.share.toFixed(1)}%</td><td>${(x.pool - x.voted).toLocaleString()}</td></tr>`).join('')}</table><div class="mapnote">"Not yet voted" includes people who have moved, died or left the rolls, and people who will vote on Election Day. It is not a count of voters still to come.</div>`;
+}
+
+function profBars(title, regO, earlyO, order, note){
+  const R = PROFILE, rt = R.registered_total, et = R.early_on_rolls;
+  const rows = order.map(([k, label])=>({label, r:regO[k]||0, e:earlyO[k]||0})).filter(x=>x.r || x.e);
+  const mx = Math.max(...rows.map(x=>Math.max(x.r/rt, x.e/et)));
+  const bar = (v, col) => `<div style="height:8px; background:var(--line); margin:2px 0; width:100%"><div style="height:100%; width:${v/mx*100}%; background:${col}"></div></div>`;
+  return `<div style="font-family:-apple-system,Helvetica,Arial,sans-serif; font-size:.82rem; font-weight:600; margin:18px 0 6px">${title}</div><table><tr><th>Group</th><th>Registered</th><th>Early voters</th><th>Early voters as % of registered</th><th style="min-width:170px">Share of registered (gray) and of early voters (amber)</th></tr>`
+    + rows.map(x=>`<tr><td>${x.label}</td><td>${x.r.toLocaleString()}</td><td>${x.e.toLocaleString()}</td><td>${x.r ? (x.e/x.r*100).toFixed(1) + '%' : '\u2014'}</td><td>${bar(x.r/rt, '#B9B2A4')}${bar(x.e/et, '#F0AC42')}<span style="font-size:.72rem; color:var(--muted)">${(x.r/rt*100).toFixed(1)}% \u00b7 ${(x.e/et*100).toFixed(1)}%</span></td></tr>`).join('')
+    + `</table>` + (note ? `<div class="mapnote">${note}</div>` : '');
+}
+
+function renderProfile(){
+  const P = PROFILE, ids = ['profSummary','profAge','profReg','profGen','profNew','profTrend'].reduce((o,k)=>(o[k]=document.getElementById(k), o), {});
+  if(!P.day){ ids.profSummary.style.display = 'none'; ids.profAge.innerHTML = EMPTY_MSG; ['profReg','profGen','profNew','profTrend'].forEach(k=>ids[k].innerHTML = ''); return; }
+  const et = P.early_on_rolls, pc = (a, b) => (a/b*100), f0 = x => x.toFixed(0) + '%', old = P.age.early['65+'], nv = P.new_voters;
+  ids.profSummary.style.display = '';
+  ids.profSummary.innerHTML = `<b>Voters 65 and older are ${f0(pc(old, et))} of early voters but ${f0(pc(P.age.registered['65+'], P.registered_total))} of registered voters.</b> ${f0(pc(nv.new_registrants_early, et))} of early voters registered since the 2024 general, and ${f0(pc(nv.no_general_early, et))} have not voted in a general election since 2016.<small>Matched to the full Tarrant registration rolls: ${et.toLocaleString()} of ${P.early_total.toLocaleString()} early voters (${(et/P.early_total*100).toFixed(1)}%) are on the rolls. Age is age on Election Day. General-election history is statewide, so it includes votes cast in other counties before a voter moved here. The ${P.early_not_on_rolls.toLocaleString()} early voters not on the rolls, and ${((P.age.early['Unknown']||0)).toLocaleString()} early voters with no birth date, are left out of the groups that need that information.</small>`;
+  const ageOrder = [["Under 18","Under 18 (data issue)"],["18-24","18 to 24"],["25-34","25 to 34"],["35-44","35 to 44"],["45-54","45 to 54"],["55-64","55 to 64"],["65+","65 and older"],["Unknown","Birth date missing"]];
+  ids.profAge.innerHTML = profBars('Age', P.age.registered, P.age.early, ageOrder, 'The oldest voters vote earliest: about half of voters 65 and older have already voted, against under one in five voters under 35.');
+  const regOrder = [["Before 2016","Registered before 2016"],["2016-2019","2016 to 2019"],["2020 to the 2022 general","2020 to the 2022 general"],["After the 2022 general, before the 2024 general","After the 2022 general, before the 2024 general"],["Since the 2024 general","Since the 2024 general"],["Unknown","Date missing or invalid"]];
+  ids.profReg.innerHTML = profBars('When they registered', P.registration.registered, P.registration.early, regOrder, 'Registration dates run through Oct. 31, 2026.');
+  const genOrder = [["0","None"],["1","1 of 5"],["2","2 of 5"],["3","3 of 5"],["4","4 of 5"],["5","All 5"]];
+  ids.profGen.innerHTML = profBars('General elections voted, 2016 to 2024 (out of 5)', P.generals.registered, P.generals.early, genOrder, 'The five generals are 2016, 2018, 2020, 2022 and 2024. Voters who voted in all five are about half of early voters.');
+  const ft = P.first_time_primary, rate = (e, r) => r ? (e/r*100).toFixed(1) + '%' : '\u2014';
+  const nrow = (label, r, e, bold, indent) => `<tr${bold ? ' style="font-weight:700"' : ''}><td${indent ? ' style="padding-left:22px"' : ''}>${label}</td><td>${r.toLocaleString()}</td><td>${e.toLocaleString()}</td><td>${rate(e, r)}</td></tr>`;
+  ids.profNew.innerHTML = `<div style="font-family:-apple-system,Helvetica,Arial,sans-serif; font-size:.82rem; font-weight:600; margin:18px 0 6px">New and first-time voters</div><table><tr><th>Group</th><th>Registered</th><th>Voted early so far</th><th>Share voted early</th></tr>`
+    + nrow('Registered since the 2024 general', nv.new_registrants_registered, nv.new_registrants_early, true, false)
+    + nrow('Never voted in a general election, 2016 to 2024', nv.no_general_registered, nv.no_general_early, true, false)
+    + nrow('Registered since the 2024 general (brand new)', nv.no_general_new_registrants_registered, nv.no_general_new_registrants_early, false, true)
+    + nrow('Registered earlier but never voted in a general', nv.no_general_long_registered_registered, nv.no_general_long_registered_early, false, true)
+    + nrow('2026 first-time primary voters (no earlier primary on the list)', ft.any.voters, ft.any.early, true, false)
+    + nrow('With a general-election record, 2016 to 2024', ft.with_general.voters, ft.with_general.early, false, true)
+    + nrow('No general-election record', ft.no_general.voters, ft.no_general.early, false, true)
+    + `</table><div class="mapnote">First-time primary voters are mostly established general-election voters: ${f0(pc(ft.with_general.voters, ft.any.voters))} voted in at least one general election since 2016, and only ${f0(pc(ft.any.new_registrants, ft.any.voters))} registered since the 2024 general. Those with no general record are much younger (median age ${ft.no_general.median_age.toFixed(0)}, against ${ft.with_general.median_age.toFixed(0)}) and mostly new registrants.</div>`;
+  // age mix of each day's early voters
+  const bd = P.by_day; if(!bd || bd.length < 2){ ids.profTrend.innerHTML = ''; return; }
+  const grp = [['Under 35', ['Under 18','18-24','25-34'], '#F0AC42'], ['35 to 54', ['35-44','45-54'], '#B9801E'], ['55 to 64', ['55-64'], '#8C8279'], ['65 and older', ['65+'], '#504846']];
+  const W = 880, H = 260, L = 46, Rr = 150, T = 14, B = 36, nD = 12, X = d => L + (d-1)*(W-L-Rr)/(nD-1), top = 60, Y = v => H-B - v/top*(H-T-B);
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Age mix of each day's early voters">`;
+  [0,20,40,60].forEach(t=>{ svg += `<line x1="${L}" y1="${Y(t)}" x2="${W-Rr}" y2="${Y(t)}" style="stroke:var(--line)" stroke-width="1"/><text x="${L-6}" y="${Y(t)+4}" text-anchor="end" font-size="11" style="fill:var(--muted)">${t}%</text>`; });
+  for(let d = 1; d <= nD; d++) svg += `<text x="${X(d)}" y="${H-B+16}" text-anchor="middle" font-size="11" style="fill:var(--muted)">${d}</text>`;
+  svg += `<text x="${(L+W-Rr)/2}" y="${H-4}" text-anchor="middle" font-size="12" style="fill:var(--ink)">Day of early voting</text>`;
+  const endLabels = [];
+  grp.forEach(([name, keys, col])=>{
+    const pts = bd.map(d=>[d.day, keys.reduce((a,k)=>a + (d.age[k]||0), 0)/d.voters*100]);
+    if(pts.length > 1) svg += `<path d="${pts.map((q,i)=>(i ? 'L' : 'M') + X(q[0]) + ',' + Y(q[1])).join(' ')}" fill="none" style="stroke:${col}" stroke-width="2.4"/>`;
+    svg += pts.map(q=>`<circle cx="${X(q[0])}" cy="${Y(q[1])}" r="3.5" style="fill:${col}"><title>${name}, day ${q[0]}: ${q[1].toFixed(1)}% of that day's early voters</title></circle>`).join('');
+    const l = pts[pts.length-1]; endLabels.push({y:Y(l[1]), x:X(l[0])+8, text:`${l[1].toFixed(0)}% ${name}`, col:col === '#F0AC42' ? '#B9801E' : col});
+  });
+  endLabels.sort((a,b)=>a.y-b.y); for(let i = 1; i < endLabels.length; i++) if(endLabels[i].y - endLabels[i-1].y < 14) endLabels[i].y = endLabels[i-1].y + 14;   // keep the end labels from overlapping
+  endLabels.forEach(q=>{ svg += `<text x="${q.x}" y="${q.y+4}" font-size="11" font-weight="700" style="fill:${q.col}">${q.text}</text>`; });
+  ids.profTrend.innerHTML = `<div style="font-family:-apple-system,Helvetica,Arial,sans-serif; font-size:.82rem; font-weight:600; margin:18px 0 6px">Age mix of each day's early voters</div>` + svg + `</svg><div class="mapnote">Each point is the share of that day's new early voters in the age group. Day 1 includes mail ballots returned before early voting opened. Voters with a missing birth date are left out.</div>`;
 }
 
 function regByField(field){
