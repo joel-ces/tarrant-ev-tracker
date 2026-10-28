@@ -43,12 +43,14 @@ fig.text(1.75 / W, top(4.5), "Dark: voted early (2022, 2024) / both years.   Amb
 
 fig.text(0.35 / W, top(4.95), "Share of past voters who have voted early in 2026, by day", fontsize=10, fontweight='bold', color=INK, va='center')
 lx = fig.add_axes([0.85 / W, top(7.3), 5.2 / W, 2.05 / H])
-dd = [r['day'] for r in R]
-for key, col, lab, ls in (('early_2024', CHAR, '2024 early voters', '-'), ('early_2022', AMBER, '2022 early voters', '-'), ('election_day_2024', GRAY, '2024 Election Day voters', (0, (4, 3)))):
-    ys = [r['retention_2026'][key]['share'] for r in R]; lx.plot(dd, ys, color=col, lw=2.4, ls=ls, marker='o', ms=4.5)
+dd = [r['day'] for r in R]; rs = {x['day']: x for x in L.get('retention_series', [])}     # same-basis curve (past voters still registered) for every day
+KEYS = {'early_2024': 'e24', 'early_2022': 'e22', 'election_day_2024': 'ed24', 'election_day_2022': 'ed22'}
+share = lambda key, r: rs[r['day']][KEYS[key]] if (r['day'] in rs and KEYS[key] in rs[r['day']]) else r['retention_2026'][key]['share']
+for key, col, lab, ls in (('early_2024', CHAR, '2024 early voters', '-'), ('early_2022', AMBER, '2022 early voters', '-'), ('election_day_2022', '#A39A8B', '2022 Election Day voters', (0, (1, 2))), ('election_day_2024', GRAY, '2024 Election Day voters', (0, (4, 3)))):
+    ys = [share(key, r) for r in R]; lx.plot(dd, ys, color=col, lw=2.4, ls=ls, marker='o', ms=4.5)
     lx.text(dd[-1] + 0.2, ys[-1], f"{ys[-1]:.1f}%\n{lab}", color='#B9801E' if col == AMBER else col, fontsize=7.6, fontweight='bold', va='center', linespacing=1.15)
 import math
-ymax = math.ceil((max(r['retention_2026'][k]['share'] for r in R for k in ('early_2024', 'early_2022', 'election_day_2024')) + 8) / 20) * 20   # scale the axis to the data
+ymax = math.ceil((max(share(k, r) for r in R for k in KEYS) + 8) / 20) * 20   # scale the axis to the data
 lx.set_xlim(0.7, 12.6); lx.set_ylim(0, ymax); lx.set_xticks(range(1, 13)); lx.set_yticks(list(range(0, ymax + 1, 20))); lx.set_yticklabels([f'{v}%' for v in range(0, ymax + 1, 20)])
 lx.tick_params(axis='both', labelsize=8, colors=MUTED, length=0); lx.grid(axis='y', color=LINE, lw=0.8); lx.set_axisbelow(True)
 for s in lx.spines.values(): s.set_visible(False)

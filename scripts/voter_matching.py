@@ -49,7 +49,7 @@ def daily(a):
     if a.rolls:   # retention by day, among past voters still registered
         sd = (16 - state.dbe).where(state.m26 == 'EV', (16 - state.dbe).clip(lower=1)).astype(int); res['retention_definition'] = 'past voters still on the registration rolls'; res['retention_series'] = []
         for d_ in range(1, a.day + 1):
-            vd = p.vuid.isin(set(state.vuid[sd <= d_])); res['retention_series'].append({'day': d_, 'e24': rate(e24, vd)['share'], 'e22': rate(e22, vd)['share'], 'ed24': rate(ed24, vd)['share']})
+            vd = p.vuid.isin(set(state.vuid[sd <= d_])); res['retention_series'].append({'day': d_, 'e24': rate(e24, vd)['share'], 'e22': rate(e22, vd)['share'], 'ed24': rate(ed24, vd)['share'], 'ed22': rate(ed22, vd)['share']})
     res['method_grid_2026_by_2024'] = {m26: j[j.m26 == m26].m24.fillna('none').value_counts().to_dict() for m26 in ('EV', 'BM')}
     t = j[(j.m26 == 'EV') & (j.m24 == 'EV')]; sh = t.dbe - t.d24
     res['timing_in_person_returners'] = {'n': len(t), 'median_days_earlier': float(sh.median()), 'earlier_2plus': round(float((sh >= 2).mean() * 100), 1), 'same_within_1': round(float((sh.abs() <= 1).mean() * 100), 1), 'later_2plus': round(float((sh <= -2).mean() * 100), 1),
