@@ -77,7 +77,10 @@ if rd_files:   # returning voters: retention series by day + the latest full res
     for f in rd_files:
         r = json.load(open(f)); rt = r['retention_2026']
         series.append({'day': r['day'], 'label': lab.get(r['day'], ''), 'matched': r['early_voters_matched'], 'e24': rt['early_2024']['share'], 'e22': rt['early_2022']['share'], 'ed24': rt['election_day_2024']['share']})
-    put('RETURNING', dump({'days': series, 'latest': json.load(open(rd_files[-1]))}))
+    _latest = json.load(open(rd_files[-1])); _rs = {x['day']: x for x in _latest.get('retention_series', [])}   # same-definition curve for every day (pools = past voters still registered)
+    for _row in series:
+        if _row['day'] in _rs: _row.update({k: _rs[_row['day']][k] for k in ('e24', 'e22', 'ed24')})
+    put('RETURNING', dump({'days': series, 'latest': _latest}))
 # per-day map data so the map can be shown "as of" any day: no-primary-history counts, early-voter primary-history [n, sum of R shares], and cumulative votes by location
 put('NP_BY_DAY', dump({str(d['day']): {k: v[0] for k, v in d['history_nonprimary']['by_precinct'].items() if v[0]} for d in days if 'history_nonprimary' in d}))
 put('HIST_EARLY_BY_DAY', dump({str(d['day']): {k: [v[0], round(v[1], 2)] for k, v in d.get('history_early', {}).items()} for d in days}))

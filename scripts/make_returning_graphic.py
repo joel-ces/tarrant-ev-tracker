@@ -47,7 +47,9 @@ dd = [r['day'] for r in R]
 for key, col, lab, ls in (('early_2024', CHAR, '2024 early voters', '-'), ('early_2022', AMBER, '2022 early voters', '-'), ('election_day_2024', GRAY, '2024 Election Day voters', (0, (4, 3)))):
     ys = [r['retention_2026'][key]['share'] for r in R]; lx.plot(dd, ys, color=col, lw=2.4, ls=ls, marker='o', ms=4.5)
     lx.text(dd[-1] + 0.2, ys[-1], f"{ys[-1]:.1f}%\n{lab}", color='#B9801E' if col == AMBER else col, fontsize=7.6, fontweight='bold', va='center', linespacing=1.15)
-lx.set_xlim(0.7, 12.6); lx.set_ylim(0, 60); lx.set_xticks(range(1, 13)); lx.set_yticks([0, 20, 40, 60]); lx.set_yticklabels(['0%', '20%', '40%', '60%'])
+import math
+ymax = math.ceil((max(r['retention_2026'][k]['share'] for r in R for k in ('early_2024', 'early_2022', 'election_day_2024')) + 8) / 20) * 20   # scale the axis to the data
+lx.set_xlim(0.7, 12.6); lx.set_ylim(0, ymax); lx.set_xticks(range(1, 13)); lx.set_yticks(list(range(0, ymax + 1, 20))); lx.set_yticklabels([f'{v}%' for v in range(0, ymax + 1, 20)])
 lx.tick_params(axis='both', labelsize=8, colors=MUTED, length=0); lx.grid(axis='y', color=LINE, lw=0.8); lx.set_axisbelow(True)
 for s in lx.spines.values(): s.set_visible(False)
 lx.set_xlabel('Day of early voting', fontsize=8.2, color=INK, labelpad=2)
@@ -59,12 +61,12 @@ for i, d in enumerate(bd):
     if d['in_person_2024']['pool'] > 0:
         v = d['in_person_2024']['share']; bx.bar(i, v, width=0.66, color=CHAR); bx.text(i, v + 1.5, f"{v:.0f}%", ha='center', va='bottom', fontsize=8, fontweight='bold', color=INK)
     else: bx.text(i, 3, "no\nvoting", ha='center', va='bottom', fontsize=6.6, color=MUTED, linespacing=1.1)
-bx.set_xticks(range(len(bd))); bx.set_xticklabels([str(d['days_out']) for d in bd], fontsize=8, color=MUTED); bx.set_ylim(0, 78); bx.set_yticks([0, 20, 40, 60]); bx.set_yticklabels(['0%', '20%', '40%', '60%'])
+bx.set_xticks(range(len(bd))); bx.set_xticklabels([str(d['days_out']) for d in bd], fontsize=8, color=MUTED); ymb = math.ceil((max(d['in_person_2024']['share'] for d in bd) + 10) / 20) * 20; bx.set_ylim(0, ymb); bx.set_yticks(list(range(0, ymb + 1, 20))); bx.set_yticklabels([f'{v}%' for v in range(0, ymb + 1, 20)])
 bx.tick_params(length=0, labelsize=8, colors=MUTED); bx.grid(axis='y', color=LINE, lw=0.8); bx.set_axisbelow(True)
 for s in bx.spines.values(): s.set_visible(False)
 bx.set_xlabel('Days before Election Day when they voted in person in 2024', fontsize=8.2, color=INK, labelpad=2)
 for i, line in enumerate(["Early = in-person early voting or a mail ballot. Matched by voter ID to the 2022 and 2024 rosters. 'Did not vote' includes new registrants.",
-                          "Past voters include people who have since moved or left the rolls. 2026 early voting is only partly done, so people who voted late in 2024 have had",
+                          "Past voters who are no longer registered in Tarrant are left out. 2026 early voting is only partly done, so people who voted late in 2024 have had",
                           "less time to vote again. 2024 was a presidential year, so it is not a like-for-like benchmark for 2026."]):
     fig.text(0.35 / W, top(10.85 + 0.19 * i), line, fontsize=6.6, color=MUTED, va='center')
 lg = fig.add_axes([0.35 / W, 0.10 / H, 1.0 / W, 0.27 / H]); lg.imshow(Image.open('assets/logo.png').convert('RGBA')); lg.axis('off')
