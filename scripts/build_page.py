@@ -2,7 +2,7 @@
 """Rebuild the data constants inside index.html from the saved daily files (aggregates only). Run from the repo root:
     python3 scripts/build_page.py
 Reads data/daily/day-NN.json (+ locations-day-NN.json) and the latest data/mail/abs-*.json. Everything else in the page is untouched.
-Updates: DATA2026, TURNOUT_BY_PRECINCT, GEO, HIST_EARLY, HIST_METHOD (early parts), HIST_CROSS (early part), PRECINCT_HISTORY, NP_METHOD, NP_BY_PRECINCT, PROFILE, NP_BY_DAY, HIST_EARLY_BY_DAY, POLL_BY_DAY, NP_TREND, RETURNING, CATEGORY_BY_DAY, POLL_VOTES, MAIL26.
+Updates: DATA2026, TURNOUT_BY_PRECINCT, GEO, HIST_EARLY, HIST_METHOD (early parts), HIST_CROSS (early part), PRECINCT_HISTORY, NP_METHOD, NP_BY_PRECINCT, PROFILE, STILL_TO_VOTE, NP_BY_DAY, HIST_EARLY_BY_DAY, POLL_BY_DAY, NP_TREND, RETURNING, CATEGORY_BY_DAY, POLL_VOTES, MAIL26.
 """
 import glob, json, os, re
 from datetime import date
@@ -89,6 +89,7 @@ if _locs:
         for _c in _L['dates']: _acc += _v['by_day'][_c]; _arr.append(_acc)
         _pb[int(_n)] = _arr
     put('POLL_BY_DAY', dump(_pb))
+if os.path.exists('data/profile/still_to_vote.json'): put('STILL_TO_VOTE', dump(json.load(open('data/profile/still_to_vote.json'))))   # past voters still to vote, by precinct
 if os.path.exists('data/profile/profile.json'): put('PROFILE', dump(json.load(open('data/profile/profile.json'))))   # voter profile totals (age, registration, general record, first-time voters)
 put('PRECINCT_HISTORY', dump([{'day': d['day'], 'label': d['label'], 'p': d['precincts']} for d in days]))
 groups = [("By Commissioner Precinct", "com", "Commissioner Pct"), ("By State Senate District", "sen", "Senate District"), ("By State House District", "hse", "House District"),
