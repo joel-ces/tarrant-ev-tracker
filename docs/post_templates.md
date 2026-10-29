@@ -25,3 +25,4 @@ Registration rolls: scripts/registration_rolls.py builds the private compact fil
 Voter profile: after voter_matching, run: python3 scripts/voter_profile.py --rolls PRIVATE/rolls_compact.csv.gz --state PRIVATE/early_2026.csv.gz --out data/profile/profile.json, then build_page.py.
 Still to vote: after voter_matching, run: python3 scripts/still_to_vote.py --rolls PRIVATE/rolls_compact.csv.gz --prior PRIVATE/prior_votes.csv.gz --state PRIVATE/early_2026.csv.gz --out data/profile/still_to_vote.json, then build_page.py (map views 'Still to Vote' and district-table columns).
 Retention among still-registered voters: run voter_matching.py daily with --rolls PRIVATE/rolls_compact.csv.gz (pools = past voters still on the rolls; also writes retention_series for every day).
+Running total: the day-by-day chart has an 'Each day / Running total' toggle and a count strip; graphics: make_category_chart.py --view running (add --method inperson|mail for variants).

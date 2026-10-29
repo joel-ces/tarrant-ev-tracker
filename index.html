@@ -128,6 +128,8 @@ footer{font-family:-apple-system,Helvetica,Arial,sans-serif; font-size:.75rem; c
   <section>
     <h2>Early voters by day: Democratic-leaning, Republican-leaning and no primary history</h2>
     <div class="maptools" id="catTools"></div>
+    <div class="maptools" id="catViewTools"></div>
+    <div id="catTotals"></div>
     <div id="catChart"></div>
   </section>
 
@@ -663,23 +665,40 @@ function renderMethodTools(id){
   el.querySelectorAll('button').forEach(b=>{ b.onclick = ()=>{ dataMethod = b.dataset.m; renderHistory(); renderCategoryDays(); }; });
 }
 
+let catView = 'daily';   // 'daily' (each day's new early voters) or 'running' (running total through each day)
+function renderCatViewTools(){
+  const el = document.getElementById('catViewTools'); if(!el) return;
+  el.innerHTML = [['daily','Each day'],['running','Running total']].map(v=>`<button class="mapbtn${v[0]===catView ? ' active' : ''}" data-v="${v[0]}">${v[1]}</button>`).join('');
+  el.querySelectorAll('button').forEach(b=>{ b.onclick = ()=>{ catView = b.dataset.v; renderCategoryDays(); }; });
+}
+function renderCatTotals(mk){
+  const el = document.getElementById('catTotals'); if(!el || !CATEGORY_BY_DAY.length) return;
+  const last = CATEGORY_BY_DAY[CATEGORY_BY_DAY.length-1], q = last[mk], tot = q[0] + q[1] + q[2], cols = ["#1F5C6F","#8A1538","#F0AC42"], names = ["Democratic-leaning","Republican-leaning","No primary history"];
+  const who = {total:'early voters', inperson:'in-person early voters', mail:'mail ballots returned'}[dataMethod];
+  const tile = (label, n, pctTxt, col) => `<div style="border:1px solid var(--line); border-left:6px solid ${col}; padding:8px 14px; min-width:150px; flex:1"><div style="font-size:.72rem; color:var(--muted); font-family:-apple-system,Helvetica,Arial,sans-serif">${label}</div><div style="font-size:1.4rem; font-weight:700; line-height:1.2">${n.toLocaleString()}</div><div style="font-size:.74rem; color:var(--muted); font-family:-apple-system,Helvetica,Arial,sans-serif">${pctTxt}</div></div>`;
+  el.innerHTML = `<div style="font-family:-apple-system,Helvetica,Arial,sans-serif; font-size:.82rem; font-weight:600; margin:10px 0 6px">Running total through ${last.label} (${who})</div><div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:14px">`
+    + names.map((nm,k)=>tile(nm, q[k], tot ? (q[k]/tot*100).toFixed(1) + '% of the total' : '', cols[k])).join('')
+    + tile('All ' + who, tot, 'through ' + last.label, '#504846') + `</div>`;
+}
+
 function renderCategoryDays(){
   const el = document.getElementById('catChart');
-  renderMethodTools('catTools');
+  renderMethodTools('catTools'); renderCatViewTools();
   if(!CATEGORY_BY_DAY.length){ el.innerHTML = EMPTY_MSG; return; }
   const mk = {total:'t', inperson:'i', mail:'m'}[dataMethod];
-  const rows = CATEGORY_BY_DAY.map((c,i)=>{ const p = i ? CATEGORY_BY_DAY[i-1][mk] : [0,0,0], q = c[mk];
+  renderCatTotals(mk);
+  const rows = CATEGORY_BY_DAY.map((c,i)=>{ const p = (catView === 'running' || !i) ? [0,0,0] : CATEGORY_BY_DAY[i-1][mk], q = c[mk];   // running view: cumulative values, not day-over-day changes
     return {day:c.day, label:c.label, d:Math.max(0, q[0]-p[0]), r:Math.max(0, q[1]-p[1]), n:Math.max(0, q[2]-p[2])}; });
   const top = Math.max(...rows.map(r=>r.d+r.r+r.n)), step = niceStep(top), maxY = Math.ceil(top/step)*step;
   const W = 880, H = 320, L = 62, Rr = 20, T = 20, B = 50, nD = 12, band = (W-L-Rr)/nD, bw = band*0.64;
   const Y = v => H-B - v/maxY*(H-T-B), cols = ["#1F5C6F","#8A1538","#F0AC42"], names = ["Democratic-leaning","Republican-leaning","No primary history"];
-  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Early voters each day by primary history">`;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${catView === 'running' ? 'Running total of early voters by primary history' : 'Early voters each day by primary history'}">`;
   for(let t = 0; t <= maxY + 1; t += step) svg += `<line x1="${L}" y1="${Y(t)}" x2="${W-Rr}" y2="${Y(t)}" style="stroke:var(--line)" stroke-width="1"/><text x="${L-8}" y="${Y(t)+4}" text-anchor="end" font-size="11" style="fill:var(--muted)">${t.toLocaleString()}</text>`;
   rows.forEach(r=>{
     const x = L + (r.day-1)*band + (band-bw)/2, vals = [r.d, r.r, r.n]; let acc = 0;
     vals.forEach((v,k)=>{
-      svg += `<rect x="${x}" y="${Y(acc+v)}" width="${bw}" height="${Math.max(0, Y(acc)-Y(acc+v))}" fill="${cols[k]}"><title>${r.label}, ${names[k]}: ${v.toLocaleString()} (${(v/(r.d+r.r+r.n)*100).toFixed(0)}% of the day)</title></rect>`;
-      const segH = Y(acc)-Y(acc+v), mid = (Y(acc)+Y(acc+v))/2, fc = k===2 ? '#3A332F' : '#fff', pctDay = Math.round(v/(r.d+r.r+r.n)*100);
+      svg += `<rect x="${x}" y="${Y(acc+v)}" width="${bw}" height="${Math.max(0, Y(acc)-Y(acc+v))}" fill="${cols[k]}"><title>${r.label}, ${names[k]}: ${v.toLocaleString()} (${((r.d+r.r+r.n) ? v/(r.d+r.r+r.n)*100 : 0).toFixed(0)}% of ${catView === 'running' ? 'all early voters so far' : 'the day'})</title></rect>`;
+      const segH = Y(acc)-Y(acc+v), mid = (Y(acc)+Y(acc+v))/2, fc = k===2 ? '#3A332F' : '#fff', pctDay = (r.d+r.r+r.n) ? Math.round(v/(r.d+r.r+r.n)*100) : 0;
       if(segH > 32) svg += `<text x="${x+bw/2}" y="${mid-2}" text-anchor="middle" font-size="10" font-weight="700" fill="${fc}">${(v/1000).toFixed(1)}k</text><text x="${x+bw/2}" y="${mid+11}" text-anchor="middle" font-size="10" font-weight="700" fill="${fc}">${pctDay}%</text>`;
       else if(segH > 15) svg += `<text x="${x+bw/2}" y="${mid+4}" text-anchor="middle" font-size="10" font-weight="700" fill="${fc}">${(v/1000).toFixed(1)}k</text>`;
       acc += v;
@@ -690,7 +709,7 @@ function renderCategoryDays(){
   svg += `<text x="${(L+W-Rr)/2}" y="${H-6}" text-anchor="middle" font-size="12" style="fill:var(--ink)">Day of early voting</text></svg>`;
   const lq = CATEGORY_BY_DAY[CATEGORY_BY_DAY.length-1][mk], last = {d:lq[0], r:lq[1], n:lq[2]}, tot = last.d + last.r + last.n, sh = v => tot ? (v/tot*100).toFixed(0) + '%' : '\u2014';
   const who = {total:'all early voters', inperson:'in-person early voters', mail:'mail ballots returned'}[dataMethod];
-  el.innerHTML = svg + `<div class="legend">${names.map((n,k)=>`<span><i class="dot" style="background:${cols[k]}"></i>${n}</span>`).join('')}</div><div class="mapnote"><b>So far, among ${who}: ${sh(last.d)} Democratic-leaning, ${sh(last.r)} Republican-leaning, ${sh(last.n)} no primary history.</b> Each bar is that day's ${dataMethod === 'mail' ? 'net change in returned ballots' : 'early voters'}, with the day's total on top and each group's count and share of the day inside its segment (the day's change in the running total; Day 1 includes mail ballots returned before early voting opened). Democratic-leaning means mostly voted in Democratic primaries since 2016, and Republican-leaning likewise. "No primary history" also holds the few early voters with redacted IDs. This shows past primary choices, not how anyone votes in November.</div>`;
+  el.innerHTML = svg + `<div class="legend">${names.map((n,k)=>`<span><i class="dot" style="background:${cols[k]}"></i>${n}</span>`).join('')}</div><div class="mapnote"><b>So far, among ${who}: ${sh(last.d)} Democratic-leaning, ${sh(last.r)} Republican-leaning, ${sh(last.n)} no primary history.</b> ${catView === 'running' ? 'Each bar is the running total through that day (all early voters so far), with the total on top and each group\'s count and share of that total inside its segment.' : 'Each bar is that day\'s ' + (dataMethod === 'mail' ? 'net change in returned ballots' : 'early voters') + ', with the day\'s total on top and each group\'s count and share of the day inside its segment (the day\'s change in the running total; Day 1 includes mail ballots returned before early voting opened).'} Democratic-leaning means mostly voted in Democratic primaries since 2016, and Republican-leaning likewise. "No primary history" also holds the few early voters with redacted IDs. This shows past primary choices, not how anyone votes in November.</div>`;
 }
 
 const npListN = p => (HIST_BASE[p]||[0])[0], npRegNP = p => Math.max(0, (REGISTERED[p]||0) - npListN(p));
