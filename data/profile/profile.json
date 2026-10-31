@@ -1,9 +1,9 @@
 {
- "day": 11,
+ "day": 12,
  "registered_total": 1358207,
- "early_total": 529552,
- "early_on_rolls": 525448,
- "early_not_on_rolls": 4104,
+ "early_total": 592850,
+ "early_on_rolls": 587946,
+ "early_not_on_rolls": 4904,
  "age": {
   "registered": {
    "Under 18": 69,
@@ -17,13 +17,13 @@
   },
   "early": {
    "Under 18": 2,
-   "18-24": 36440,
-   "25-34": 61514,
-   "35-44": 71865,
-   "45-54": 83613,
-   "55-64": 102681,
-   "65+": 169313,
-   "Unknown": 20
+   "18-24": 42829,
+   "25-34": 73347,
+   "35-44": 84448,
+   "45-54": 95873,
+   "55-64": 112939,
+   "65+": 178486,
+   "Unknown": 22
   }
  },
  "registration": {
@@ -36,12 +36,12 @@
    "Unknown": 1627
   },
   "early": {
-   "Before 2016": 294200,
-   "2016-2019": 73726,
-   "2020 to the 2022 general": 67781,
-   "After the 2022 general, before the 2024 general": 46257,
-   "Since the 2024 general": 43140,
-   "Unknown": 344
+   "Before 2016": 320823,
+   "2016-2019": 84140,
+   "2020 to the 2022 general": 78089,
+   "After the 2022 general, before the 2024 general": 54085,
+   "Since the 2024 general": 50391,
+   "Unknown": 418
   }
  },
  "generals": {
@@ -54,42 +54,42 @@
    "5": 330019
   },
   "early": {
-   "0": 40991,
-   "1": 46604,
-   "2": 45467,
-   "3": 60973,
-   "4": 79227,
-   "5": 252186
+   "0": 48846,
+   "1": 55686,
+   "2": 53565,
+   "3": 70289,
+   "4": 89394,
+   "5": 270166
   }
  },
  "new_voters": {
   "new_registrants_registered": 165362,
-  "new_registrants_early": 43140,
+  "new_registrants_early": 50391,
   "no_general_registered": 372369,
-  "no_general_early": 40991,
-  "no_general_new_registrants_early": 28651,
-  "no_general_long_registered_early": 12340,
+  "no_general_early": 48846,
+  "no_general_new_registrants_early": 33767,
+  "no_general_long_registered_early": 15079,
   "no_general_new_registrants_registered": 132148,
   "no_general_long_registered_registered": 240221
  },
  "first_time_primary": {
   "any": {
    "voters": 95252,
-   "early": 68394,
+   "early": 75616,
    "democratic": 69454,
    "median_age": 43.0,
    "new_registrants": 9846
   },
   "with_general": {
    "voters": 84866,
-   "early": 61965,
+   "early": 68440,
    "democratic": 61220,
    "median_age": 45.0,
    "new_registrants": 2663
   },
   "no_general": {
    "voters": 10386,
-   "early": 6429,
+   "early": 7176,
    "democratic": 8234,
    "median_age": 30.0,
    "new_registrants": 7183
@@ -105,11 +105,11 @@
     "35-44": 6066,
     "45-54": 7075,
     "55-64": 10896,
-    "65+": 30795,
+    "65+": 30801,
     "Unknown": 2
    },
    "new_registrants": 3921,
-   "voters": 61747
+   "voters": 61753
   },
   {
    "day": 2,
@@ -165,11 +165,11 @@
     "35-44": 7573,
     "45-54": 8822,
     "55-64": 10509,
-    "65+": 14756,
+    "65+": 14757,
     "Unknown": 3
    },
    "new_registrants": 4442,
-   "voters": 51954
+   "voters": 51955
   },
   {
    "day": 6,
@@ -180,11 +180,11 @@
     "35-44": 7766,
     "45-54": 10742,
     "55-64": 11732,
-    "65+": 9096,
+    "65+": 9097,
     "Unknown": 2
    },
    "new_registrants": 4962,
-   "voters": 51628
+   "voters": 51629
   },
   {
    "day": 7,
@@ -260,6 +260,21 @@
    },
    "new_registrants": 4664,
    "voters": 46680
+  },
+  {
+   "day": 12,
+   "age": {
+    "Under 18": 0,
+    "18-24": 6389,
+    "25-34": 11833,
+    "35-44": 12583,
+    "45-54": 12260,
+    "55-64": 10258,
+    "65+": 9165,
+    "Unknown": 2
+   },
+   "new_registrants": 7251,
+   "voters": 62490
   }
  ]
 }
